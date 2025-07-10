@@ -1,8 +1,24 @@
 spring:
     application:
         name: rinhabackend
+    datasource:
+        url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/rinhadb}
+        username: ${SPRING_DATASOURCE_USERNAME:rinhauser}
+        password: ${SPRING_DATASOURCE_PASSWORD:rinhapass}
+        driver-class-name: org.postgresql.Driver
+    jpa:
+        hibernate:
+            ddl-auto: update
+        show-sql: false
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.PostgreSQLDialect
+                format_sql: true
 
 server:
     port: 9999
 
-
+logging:
+    level:
+        org.springframework.web: INFO
+        org.hibernate: INFO

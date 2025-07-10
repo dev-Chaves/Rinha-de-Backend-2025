@@ -1,0 +1,75 @@
+services:
+
+  payment-processor-1:
+    image: zanfranceschi/payment-processor
+    networks:
+      - payment-processor
+    hostname: payment-processor-default
+    ports:
+      - 8001:8080
+    # etc...
+
+  payment-processor-2:
+    image: zanfranceschi/payment-processor
+    networks:
+      - payment-processor
+    hostname: payment-processor-fallback
+    ports:
+      - 8002:8080
+
+  api:
+    build: .
+    ports:
+    - "9999:9999"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+    networks:
+      - backend
+  db:
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend
+
+  load-balancer:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./resources/nginx:/etc/nginx
+
+  rabbitmq:
+    image: rabbitmq:4.1.2-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+volumes:
+  db_data:
+
+networks:
+
+  payment-processor:
+    name: payment-processor
+    driver: bridge
+  
+  backend:
+    name: backend
+    driver: bridge
