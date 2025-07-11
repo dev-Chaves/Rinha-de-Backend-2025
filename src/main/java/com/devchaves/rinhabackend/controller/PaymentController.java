@@ -20,7 +20,7 @@ public class PaymentController {
         this.paymentService = paymentService;
     }
 
-    @PostMapping("payment")
+    @PostMapping("/payment")
     public ResponseEntity<PaymentRespondeDTO> paymentPost(@RequestBody PaymentDTO dto) {
 
         PaymentRespondeDTO response = paymentService.processPayment(dto);
