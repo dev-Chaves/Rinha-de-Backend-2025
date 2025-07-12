@@ -1,6 +1,7 @@
 package com.devchaves.rinhabackend.services;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -27,7 +28,7 @@ public class PaymentService {
 
         UUID id = UUID.randomUUID();
         BigDecimal amount = paymentDTO.amount();
-        PaymentRespondeDTO response = new PaymentRespondeDTO(id, amount);
+        PaymentRespondeDTO response = new PaymentRespondeDTO(id, amount, LocalDateTime.now());
 
         rabbitTemplate.convertAndSend(QueueConfig.paymentQueue, response);
 
